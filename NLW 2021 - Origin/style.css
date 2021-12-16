@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+
+* {
+
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    webkit-font-smoothing: antialiased;
+    --gray: hsl(240,9%,89%);
+    
+}
+
+body {
+    display: grid;
+}
+
+main {
+    
+    background-image: url(media/Mobile.svg);
+    width: 375px;
+    height: 812px;
+    place-items: center;
+    color: var(--gray);
+}
+
+.container {
+    max-width: 250px;
+    margin: 0 auto;
+    text-align: center;
+
+}

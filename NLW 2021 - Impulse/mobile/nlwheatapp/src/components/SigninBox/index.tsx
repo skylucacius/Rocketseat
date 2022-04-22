@@ -7,7 +7,7 @@ export function SigninBox() {
     return (
         <View style={styles.container}>
             <Button
-                title="ENTRAR COM GITHUB" 
+                title="ENTRAR COM GITHUB"
                 color={COLORS.BLACK_PRIMARY} 
                 backgroundColor={COLORS.YELLOW}
             />

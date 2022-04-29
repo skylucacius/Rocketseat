@@ -1,7 +1,9 @@
 import React, {createContext, useContext, useState} from "react";
-import * as authSession from 'expo-auth-session'
+import * as AuthSessions from 'expo-auth-session'
+import * as WebBrowser from 'expo-web-browser';
+import { ensureAuthenticated } from './../../../../src/middlewares/ensureAuthenticated';
 
-const CLIENT_ID = '6034131077647e5b4710'
+const CLIENT_ID = '57f382b75acef0580b2e'
 const SCOPE = 'read:user'
 
 type User = {
@@ -29,11 +31,14 @@ type authResponse = {
 
 type AuthorizationResponse = {
     params : {
-        code?: string
-    }
+        code?: string,
+        error?: string
+    },
+    type?:string
 }
 
 
+WebBrowser.maybeCompleteAuthSession()
 
 export const AuthContext = createContext({} as AuthContextData)
 
@@ -41,10 +46,10 @@ export function AuthProvider( {children }: AuthProviderProps ) {
     const [isSigning, setIsSigning] = useState(false)
     const [user, setUser] = useState(null)
     async function signIn() {
-        const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=${SCOPE}`
-        const {params} = await authSession.startAsync({authUrl}) as AuthorizationResponse
-        console.log(params)
+            const authUrl = `http://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=${SCOPE}`
+            await AuthSessions.startAsync({authUrl})
     }
+    
     async function signOut() {
 
     }

@@ -1,10 +1,12 @@
-import React, {createContext, useContext, useState} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import * as AuthSessions from 'expo-auth-session'
-import * as WebBrowser from 'expo-web-browser';
-import { ensureAuthenticated } from './../../../../src/middlewares/ensureAuthenticated';
+import { api } from "../services/api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CLIENT_ID = '57f382b75acef0580b2e'
+const CLIENT_ID = '6034131077647e5b4710'
 const SCOPE = 'read:user'
+const USER_STORAGE = '@nlwheat:user'
+const TOKEN_STORAGE = '@nlwheat:token'
 
 type User = {
     id: string,
@@ -24,7 +26,7 @@ type AuthProviderProps = {
     children: React.ReactNode
 }
 
-type authResponse = {
+type AuthResponse = {
     token: string,
     user: User
 }
@@ -38,23 +40,55 @@ type AuthorizationResponse = {
 }
 
 
-WebBrowser.maybeCompleteAuthSession()
-
 export const AuthContext = createContext({} as AuthContextData)
 
-export function AuthProvider( {children }: AuthProviderProps ) {
-    const [isSigning, setIsSigning] = useState(false)
-    const [user, setUser] = useState(null)
+export function AuthProvider( { children }: AuthProviderProps ) {
+    const [isSigning, setIsSigning] = useState(true)
+    const [user, setUser] = useState<User | null>(null)
+
     async function signIn() {
+        try {
             const authUrl = `http://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=${SCOPE}`
-            await AuthSessions.startAsync({authUrl})
+            const authSessionResponse = await AuthSessions.startAsync({authUrl}) as AuthorizationResponse
+    
+            if (authSessionResponse.type == 'success' && authSessionResponse.params.error != 'access_denied') {
+                const authResponse = await api.post('/authenticate', {code: authSessionResponse.params.code})
+                const { user, token } = authResponse.data as AuthResponse
+    
+                api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+                await AsyncStorage.setItem(USER_STORAGE, JSON.stringify(user))
+                await AsyncStorage.setItem(TOKEN_STORAGE, JSON.stringify(token))
+                setUser(user)
+            }
+        }
+        catch(error) {
+            console.log(error)
+        }
+        finally {
+            setIsSigning(false)
+        }
     }
     
     async function signOut() {
 
     }
 
-    return (
+    useEffect(() => {
+        async function loadUserStorageData() {
+            const userStorage = await AsyncStorage.getItem(USER_STORAGE)
+            const tokenStorage = await AsyncStorage.getItem(TOKEN_STORAGE)
+
+            if (userStorage && tokenStorage) {
+                api.defaults.headers.common['Authorization'] = `Bearer ${TOKEN_STORAGE}`
+                setUser(JSON.parse(userStorage))
+            }
+            setIsSigning(false)
+        }
+
+        loadUserStorageData()
+    }, [])
+
+        return (
 <AuthContext.Provider value={{user, isSigning, signIn, signOut}}>
             {children}
 </AuthContext.Provider>

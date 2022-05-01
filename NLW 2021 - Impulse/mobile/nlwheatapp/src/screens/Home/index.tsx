@@ -5,14 +5,15 @@ import { Header } from './../../components/Header/index';
 import { MessageList } from './../../components/MessageList/index';
 import { SigninBox } from './../../components/SigninBox/index';
 import { SendMessageForm } from './../../components/SendMessageForm/index';
+import { useAuth } from './../../hooks/auth';
 
 export function Home() {
+    const { user } = useAuth();
     return (
         <View style={styles.container}>
             <Header></Header>
             <MessageList></MessageList>
-            <SigninBox></SigninBox>
-            {/* <SendMessageForm></SendMessageForm> */}
-        </View>
+            {user ? <SendMessageForm /> : <SigninBox />}
+         </View>
     )
 }

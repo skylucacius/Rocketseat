@@ -4,8 +4,9 @@ import { Message, MessageProps } from './../Message/index';
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import { io } from 'socket.io-client';
+import { MESSAGES_EXAMPLE } from '../../utils/messages';
 
-let messagesQueue:MessageProps[] = []
+let messagesQueue:MessageProps[] = MESSAGES_EXAMPLE
 
 const socket = io(String(api.defaults.baseURL))
 socket.on('new_message', (new_message) => {

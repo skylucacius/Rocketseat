@@ -70,7 +70,9 @@ export function AuthProvider( { children }: AuthProviderProps ) {
     }
     
     async function signOut() {
-
+        setUser(null)
+        const userStorage = await AsyncStorage.removeItem(USER_STORAGE)
+        const tokenStorage = await AsyncStorage.removeItem(TOKEN_STORAGE)
     }
 
     useEffect(() => {

@@ -57,7 +57,7 @@ export function AuthProvider( { children }: AuthProviderProps ) {
     
                 api.defaults.headers.common['Authorization'] = `Bearer ${token}`
                 await AsyncStorage.setItem(USER_STORAGE, JSON.stringify(user))
-                await AsyncStorage.setItem(TOKEN_STORAGE, JSON.stringify(token))
+                await AsyncStorage.setItem(TOKEN_STORAGE, token)
                 setUser(user)
             }
         }
@@ -71,8 +71,8 @@ export function AuthProvider( { children }: AuthProviderProps ) {
     
     async function signOut() {
         setUser(null)
-        const userStorage = await AsyncStorage.removeItem(USER_STORAGE)
-        const tokenStorage = await AsyncStorage.removeItem(TOKEN_STORAGE)
+        await AsyncStorage.removeItem(USER_STORAGE)
+        await AsyncStorage.removeItem(TOKEN_STORAGE)
     }
 
     useEffect(() => {
@@ -81,7 +81,7 @@ export function AuthProvider( { children }: AuthProviderProps ) {
             const tokenStorage = await AsyncStorage.getItem(TOKEN_STORAGE)
 
             if (userStorage && tokenStorage) {
-                api.defaults.headers.common['Authorization'] = `Bearer ${TOKEN_STORAGE}`
+                api.defaults.headers.common['Authorization'] = `Bearer ${tokenStorage}`
                 setUser(JSON.parse(userStorage))
             }
             setIsSigning(false)
